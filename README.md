@@ -32,7 +32,11 @@ var config = {
 | `taxModifier`    | *Optional*  Multiplier to add tax, ex. for 10% tax use `1.1` FI REGION TAXES ARE ADDED AUTOMATICALLY! <br>**Type:** `float` <br>**Default:** `1.0`
 | `currentPriceHeader` | *Optional*  Add header for current price <br><br>**Type:** `string` <br>**Default:** "Sähkön hinta nyt"
 | `currentPriceFooter` | *Optional*  Add footer for current price <br><br>**Type:** `string` <br>**Default:** "snt/kWh"
-| `chartConfig`    | *Optional*  Modify default chart config <br><br>**Default:** `{
+| `chartConfig`    | *Optional*  Modify default chart config
+
+Default config for chart:
+
+                        {
                                 type: "bar",
                                 data: {
                                         datasets: [{
@@ -94,4 +98,3 @@ var config = {
                                         }
                                 }
                         }
-`
