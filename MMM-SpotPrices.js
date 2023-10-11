@@ -18,7 +18,69 @@ Module.register("MMM-SpotPrices", {
 		includeTax: true,
 		taxModifier: 1.0,
 		currentPriceHeader: "Sähkön hinta nyt",
-		currentPriceFooter: "snt/kWh"
+		currentPriceFooter: "snt/kWh",
+		chartConfig:{
+				type: "bar",
+				data: {
+					datasets: [{
+						datalabels: {
+							align: "end",
+							anchor: "end",
+							rotation: -90
+						}
+					}]
+				},
+				options: {
+					elements: {
+						bar: {
+							backgroundColor: "#999"
+						}
+					},
+					maxBarThickness: 12,
+					barPercentage: 0.8,
+					layout: {
+						padding: {
+							top: 20
+						}
+					},
+					title: {
+						display: false
+					},
+					scales: {
+						y: {
+							ticks: {
+								display: false
+							}
+						},
+						x: {
+							ticks: {
+								font: {
+									weight: "bold"
+								},
+								color: "#fff"
+							}
+						}
+					},
+					plugins: {
+						legend: {
+							display: false
+						},
+						tooltip: {
+							enabled: false
+						},
+						datalabels: {
+							color: "#fff",
+							font: {
+								weight: "bold"
+							},
+							formatter: function(value, context){
+								let numb = Math.round((value + Number.EPSILON) * 10) / 10;
+								return numb.toFixed(1).replace(".",",");
+							}
+						}
+					}
+				}
+			}
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -194,70 +256,10 @@ Module.register("MMM-SpotPrices", {
 			}
 			var ctx = document.getElementById("pricesChart").getContext("2d");
 			if (typeof this.chart !== 'undefined'){ this.chart.destroy(); }
-			this.chart = new Chart(ctx, {
-				type: "bar",
-				data: {
-					labels: xValues,
-					datasets: [{
-						data: yValues,
-						datalabels: {
-							align: "end",
-							anchor: "end",
-							rotation: -90
-						}
-					}]
-				},
-				options: {
-					elements: {
-						bar: {
-							backgroundColor: "#999"
-						}
-					},
-					maxBarThickness: 12,
-					barPercentage: 0.8,
-					layout: {
-						padding: {
-							top: 20
-						}
-					},
-					title: {
-						display: false
-					},
-					scales: {
-						y: {
-							ticks: {
-								display: false
-							}
-						},
-						x: {
-							ticks: {
-								font: {
-									weight: "bold"
-								},
-								color: "#fff"
-							}
-						}
-					},
-					plugins: {
-						legend: {
-							display: false
-						},
-						tooltip: {
-							enabled: false
-						},
-						datalabels: {
-							color: "#fff",
-							font: {
-								weight: "bold"
-							},
-							formatter: function(value, context){
-								let numb = Math.round((value + Number.EPSILON) * 10) / 10;
-								return numb.toFixed(1).replace(".",",");
-							}
-						}
-					}
-				}
-			});
+			this.config.chartConfig.data["labels"] = xValues;
+			this.config.chartConfig.data.datasets[0]["data"] = yValues;
+			this.chart = new Chart(ctx, this.config.chartConfig);
+
 		} else {
 			setTimeout(() => { self.loadPricesChart(); }, 1000);
 		}

@@ -32,3 +32,66 @@ var config = {
 | `taxModifier`    | *Optional*  Multiplier to add tax, ex. for 10% tax use `1.1` FI REGION TAXES ARE ADDED AUTOMATICALLY! <br>**Type:** `float` <br>**Default:** `1.0`
 | `currentPriceHeader` | *Optional*  Add header for current price <br><br>**Type:** `string` <br>**Default:** "Sähkön hinta nyt"
 | `currentPriceFooter` | *Optional*  Add footer for current price <br><br>**Type:** `string` <br>**Default:** "snt/kWh"
+| `chartConfig`    | *Optional*  Modify default chart config <br><br>**Default:** `{
+                                type: "bar",
+                                data: {
+                                        datasets: [{
+                                                datalabels: {
+                                                        align: "end",
+                                                        anchor: "end",
+                                                        rotation: -90
+                                                }
+                                        }]
+                                },
+                                options: {
+                                        elements: {
+                                                bar: {
+                                                        backgroundColor: "#999"
+                                                }
+                                        },
+                                        maxBarThickness: 12,
+                                        barPercentage: 0.8,
+                                        layout: {
+                                                padding: {
+                                                        top: 20
+                                                }
+                                        },
+                                        title: {
+                                                display: false
+                                        },
+                                        scales: {
+                                                y: {
+                                                        ticks: {
+                                                                display: false
+                                                        }
+                                                },
+                                                x: {
+                                                        ticks: {
+                                                                font: {
+                                                                        weight: "bold"
+                                                                },
+                                                                color: "#fff"
+                                                        }
+                                                }
+                                        },
+                                        plugins: {
+                                                legend: {
+                                                        display: false
+                                                },
+                                                tooltip: {
+                                                        enabled: false
+                                                },
+                                                datalabels: {
+                                                        color: "#fff",
+                                                        font: {
+                                                                weight: "bold"
+                                                        },
+                                                        formatter: function(value, context){
+                                                                let numb = Math.round((value + Number.EPSILON) * 10) / 10;
+                                                                return numb.toFixed(1).replace(".",",");
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+`
