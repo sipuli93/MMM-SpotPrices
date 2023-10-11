@@ -13,8 +13,10 @@ Module.register("MMM-SpotPrices", {
 		updateDataInterval: 1000*60*60,
 		retryDelay: 1000*60,
 		animationSpeed: 400,
-		noChart: false,
-		region: "FI"
+		Chart: true,
+		region: "FI",
+		includeTax: true,
+		taxModifier: 1.0
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -144,7 +146,7 @@ Module.register("MMM-SpotPrices", {
 		for (let i=0;i<data.data.length;i++){
 			this.dataRequest.prices.push({
 				"DateTimeUTC": new Date(new Date(data.data[i].DateTime).toUTCString()),
-				"PriceWithTax": data.data[i].PriceWithTax * 100
+				"Price": ( this.config.includeTax ? ( data.data[i].PriceWithTax * this.config.taxModifier ) : data.data[i].PriceNoTax ) * 100
 			});
 		}
 
@@ -177,15 +179,15 @@ Module.register("MMM-SpotPrices", {
 					futurePrices.push(this.dataRequest.prices[i]);
 				}
 			}
-			let numb = Math.round((currentPrice.PriceWithTax + Number.EPSILON) * 10) / 10;
+			let numb = Math.round((currentPrice.Price + Number.EPSILON) * 10) / 10;
 			document.getElementById("currentPrice").innerHTML = numb.toFixed(1).replace(".",",");
 
-			if (this.config.noChart){ return; }
+			if (! this.config.Chart){ return; }
 
 			var xValues = [];
 			var yValues = [];
 			for (let i=0; i<futurePrices.length; i++){
-				yValues.push(futurePrices[i].PriceWithTax);
+				yValues.push(futurePrices[i].Price);
 				xValues.push(futurePrices[i].DateTimeUTC.getHours());
 			}
 			var ctx = document.getElementById("pricesChart").getContext("2d");
