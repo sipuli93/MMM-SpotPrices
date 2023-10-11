@@ -16,7 +16,9 @@ Module.register("MMM-SpotPrices", {
 		Chart: true,
 		region: "FI",
 		includeTax: true,
-		taxModifier: 1.0
+		taxModifier: 1.0,
+		currentPriceHeader: "Sähkön hinta nyt",
+		currentPriceFooter: "snt/kWh"
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -100,14 +102,14 @@ Module.register("MMM-SpotPrices", {
 			var currentPriceElem = document.createElement("div");
 			currentPriceElem.classList.add("flex-column");
 			var currentPriceHeader = document.createElement("div");
-			currentPriceHeader.appendChild(document.createTextNode("Sähkön hinta nyt"));
+			currentPriceHeader.appendChild(document.createTextNode(this.config.currentPriceHeader));
 			currentPriceElem.appendChild(currentPriceHeader);
 			var currentPriceValue = document.createElement("div");
 			currentPriceValue.id = "currentPrice";
-                        currentPriceValue.appendChild(document.createTextNode("Ladataan..."));
+                        currentPriceValue.appendChild(document.createTextNode(". . ."));
 			currentPriceElem.appendChild(currentPriceValue);
                         var currentPriceSup = document.createElement("div");
-                        currentPriceSup.appendChild(document.createTextNode("snt/kWh"));
+                        currentPriceSup.appendChild(document.createTextNode(this.config.currentPriceFooter));
                         currentPriceElem.appendChild(currentPriceSup);
 
 			wrapper.appendChild(currentPriceElem);

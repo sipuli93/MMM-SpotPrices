@@ -26,7 +26,9 @@ var config = {
 
 | Option           | Description
 |----------------- |-----------
-| `region`         | *Optional*  Energy price region <br><br>**Options:** DK1, DK2, EE, FI, LT, LV, NO1, NO2, NO3, NO4, NO5, SE1, SE2, SE3, SE4 <br>**Default** "FI"
-| `Chart`          | *Optional*  Display price chart <br><br>**Options:** true, false <br>**Default** true
-| `includeTax`     | *Optional*  Include tax in prices <br><br>**Options:** true, false <br>**Default** true
-| `taxModifier`    | *Optional*  Multiplier to add tax, ex. for 10% tax use `1.1` FI REGION TAXES ARE ADDED AUTOMATICALLY! <br>**Options:** `number` <br>**Default** `1.0`
+| `region`         | *Optional*  Energy price region <br><br>**Options:** DK1, DK2, EE, FI, LT, LV, NO1, NO2, NO3, NO4, NO5, SE1, SE2, SE3, SE4 <br>**Type:** `string` <br>**Default:** "FI"
+| `Chart`          | *Optional*  Display price chart <br><br>**Type:** `boolean` <br>**Default:** true
+| `includeTax`     | *Optional*  Include tax in prices <br><br>**Type:** `boolean` <br>**Default:** true
+| `taxModifier`    | *Optional*  Multiplier to add tax, ex. for 10% tax use `1.1` FI REGION TAXES ARE ADDED AUTOMATICALLY! <br>**Type:** `float` <br>**Default:** `1.0`
+| `currentPriceHeader` | *Optional*  Add header for current price <br><br>**Type:** `string` <br>**Default:** "Sähkön hinta nyt"
+| `currentPriceFooter` | *Optional*  Add footer for current price <br><br>**Type:** `string` <br>**Default:** "snt/kWh"
