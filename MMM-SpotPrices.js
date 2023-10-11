@@ -14,7 +14,6 @@ Module.register("MMM-SpotPrices", {
 		retryDelay: 1000*60,
 		animationSpeed: 400,
 		noChart: false,
-		sourceApi: "spot-hinta.fi", //other option: porssisahko.fi
 		region: "FI"
 	},
 
@@ -46,15 +45,7 @@ Module.register("MMM-SpotPrices", {
 	getData: function() {
 		var self = this;
 		var corsProxy = "http://" + address + ":" + port + "/cors?url="
-
-		if (this.config.sourceApi == "spot-hinta.fi"){
-			var url = "https://api.spot-hinta.fi/TodayAndDayForward?region=" + this.config.region + "&HomeAssistant=false";
-		} else if (this.config.sourceApi == "porssisahko.fi"){
-			var url = "https://api.porssisahko.net/v1/latest-prices.json";
-		} else {
-			Log.error(self.name, "Invalid source api");
-			return;
-		}
+		var url = "https://api.spot-hinta.fi/TodayAndDayForward?region=" + this.config.region + "&HomeAssistant=false";
 		var retry = true;
 
 		var dataRequest = new XMLHttpRequest();
@@ -150,20 +141,11 @@ Module.register("MMM-SpotPrices", {
 		var self = this;
 
 		this.dataRequest = {"prices":[]};
-		if (this.config.sourceApi == "spot-hinta.fi"){
-			for (let i=0;i<data.data.length;i++){
-				this.dataRequest.prices.push({
-					"DateTimeUTC": new Date(new Date(data.data[i].DateTime).toUTCString()),
-					"PriceWithTax": data.data[i].PriceWithTax * 100
-				});
-			}
-		} else if (this.config.sourceApi == "porssisahko.fi"){
-			for (let i=0;i<data.prices.length;i++){
-				this.dataRequest.prices.push({
-					"DateTimeUTC": new Date(data.prices[i].startDate),
-					"PriceWithTax": data.prices[i].price
-				});
-			}
+		for (let i=0;i<data.data.length;i++){
+			this.dataRequest.prices.push({
+				"DateTimeUTC": new Date(new Date(data.data[i].DateTime).toUTCString()),
+				"PriceWithTax": data.data[i].PriceWithTax * 100
+			});
 		}
 
 		//Sort prices

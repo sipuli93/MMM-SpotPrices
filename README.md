@@ -25,6 +25,5 @@ var config = {
 
 | Option           | Description
 |----------------- |-----------
-| `sourceApi`      | *Optional*  The source of data <br><br>**Options:** "spot-hinta.fi", "porssisahko.fi" <br>**Default** "spot-hinta.fi"
-| `region`         | *Optional*  Energy price region, only used with sourceApi: "spot-hinta.fi" <br><br>**Options:** DK1, DK2, EE, FI, LT, LV, NO1, NO2, NO3, NO4, NO5, SE1, SE2, SE3, SE4 <br>**Default** "FI"
+| `region`         | *Optional*  Energy price region <br><br>**Options:** DK1, DK2, EE, FI, LT, LV, NO1, NO2, NO3, NO4, NO5, SE1, SE2, SE3, SE4 <br>**Default** "FI"
 | `noChart`        | *Optional*  Remove price chart <br><br>**Options:** true, false <br>**Default** false
