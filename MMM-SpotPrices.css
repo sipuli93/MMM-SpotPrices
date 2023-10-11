@@ -1,0 +1,22 @@
+/*
+ *
+ * MMM-SpotPrices
+ *
+ * sipuli93
+ * MIT Licensed.
+ *
+ * Custom here your css module
+ *
+ */
+.module.MMM-SpotPrices .flex-column {
+  justify-content: center;
+}
+.module.MMM-SpotPrices #currentPrice {
+  color: var(--color-text-bright);
+  font-size: 50px;
+}
+.module.MMM-SpotPrices .chart-holder{
+  max-width: 600px;
+  min-width: 450px;
+  min-height: 220px;
+}
