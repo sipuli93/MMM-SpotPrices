@@ -40,7 +40,7 @@ Module.register("MMM-SpotPrices", {
 					barPercentage: 0.8,
 					layout: {
 						padding: {
-							top: 20
+							top: 27
 						}
 					},
 					title: {
@@ -50,7 +50,8 @@ Module.register("MMM-SpotPrices", {
 						y: {
 							ticks: {
 								display: false
-							}
+							},
+							suggestedMax: 15
 						},
 						x: {
 							ticks: {
