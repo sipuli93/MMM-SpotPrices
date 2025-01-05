@@ -14,6 +14,8 @@ Module.register("MMM-SpotPrices", {
 		retryDelay: 1000*60,
 		animationSpeed: 400,
 		Chart: true,
+		includeCurrent: false,
+		includePast: false,
 		region: "FI",
 		includeTax: true,
 		taxModifier: 1.0,
@@ -81,7 +83,7 @@ Module.register("MMM-SpotPrices", {
 						}
 					}
 				}
-			}
+		},
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -240,6 +242,9 @@ Module.register("MMM-SpotPrices", {
 					pastPrices.push(this.dataRequest.prices[i]);
 				} else if (this.dataRequest.prices[i].DateTimeUTC - currentTime < 0){
 					currentPrice = this.dataRequest.prices[i];
+					if (this.config.includeCurrent || this.config.includePast){
+						futurePrices.push(this.dataRequest.prices[i]);
+					}
 				} else {
 					futurePrices.push(this.dataRequest.prices[i]);
 				}
@@ -249,8 +254,29 @@ Module.register("MMM-SpotPrices", {
 
 			if (! this.config.Chart){ return; }
 
+			if (this.config.includeCurrent || this.config.includePast){
+				if (this.config.includePast){
+					this.config.indexOfCurrentPrice = pastPrices.length;
+					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
+						let colors = color.index == this.config.indexOfCurrentPrice ? "#fff" : "#999";
+						return colors;
+					}
+				}
+				else {
+					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
+						let colors = color.index < 1 ? "#fff" : "#999";
+						return colors;
+					}
+				}
+			}
 			var xValues = [];
 			var yValues = [];
+			if (this.config.includePast){
+				for (let i=0; i<pastPrices.length; i++){
+					yValues.push(pastPrices[i].Price);
+					xValues.push(pastPrices[i].DateTimeUTC.getHours());
+				}
+			}
 			for (let i=0; i<futurePrices.length; i++){
 				yValues.push(futurePrices[i].Price);
 				xValues.push(futurePrices[i].DateTimeUTC.getHours());
