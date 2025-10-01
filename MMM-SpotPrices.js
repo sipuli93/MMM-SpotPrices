@@ -13,10 +13,11 @@ Module.register("MMM-SpotPrices", {
 		updateDataInterval: 1000*60*60,
 		retryDelay: 1000*60,
 		animationSpeed: 400,
-		Chart: true,
+		chart: true,
 		includeCurrent: false,
 		includePast: false,
 		region: "FI",
+		priceResolution: 15,
 		includeTax: true,
 		taxModifier: 1.0,
 		currentPriceHeader: "Sähkön hinta nyt",
@@ -58,7 +59,7 @@ Module.register("MMM-SpotPrices", {
 						x: {
 							ticks: {
 								font: {
-									weight: "bold"
+									weight: "bold",
 								},
 								color: "#fff"
 							}
@@ -74,7 +75,8 @@ Module.register("MMM-SpotPrices", {
 						datalabels: {
 							color: "#fff",
 							font: {
-								weight: "bold"
+								weight: "bold",
+								size: 8
 							},
 							formatter: function(value, context){
 								let numb = Math.round((value + Number.EPSILON) * 10) / 10;
@@ -114,7 +116,7 @@ Module.register("MMM-SpotPrices", {
 	getData: function() {
 		var self = this;
 		var corsProxy = "http://" + address + ":" + port + "/cors?url="
-		var url = "https://api.spot-hinta.fi/TodayAndDayForward?region=" + this.config.region + "&HomeAssistant=false";
+		var url = "https://api.spot-hinta.fi/TodayAndDayForward?region=" + this.config.region + "&priceResolution=" +  this.config.priceResolution + "&HomeAssistant=false&HomeAssistant15Min=false";
 		var retry = true;
 
 		var dataRequest = new XMLHttpRequest();
@@ -179,7 +181,7 @@ Module.register("MMM-SpotPrices", {
 
 			wrapper.appendChild(currentPriceElem);
 
-			if (! this.config.noChart){
+			if ( this.config.chart){
 				var futureCanvasWrapper = document.createElement("div");
 				futureCanvasWrapper.classList.add("chart-holder");
 				var futureCanvasElem = document.createElement("canvas");
@@ -210,10 +212,10 @@ Module.register("MMM-SpotPrices", {
 		var self = this;
 
 		this.dataRequest = {"prices":[]};
-		for (let i=0;i<data.data.length;i++){
+		for (let i=0;i<data.length;i++){
 			this.dataRequest.prices.push({
-				"DateTimeUTC": new Date(new Date(data.data[i].DateTime).toUTCString()),
-				"Price": ( this.config.includeTax ? ( data.data[i].PriceWithTax * this.config.taxModifier ) : data.data[i].PriceNoTax ) * 100
+				"DateTimeUTC": new Date(new Date(data[i].DateTime).toUTCString()),
+				"Price": ( this.config.includeTax ? ( data[i].PriceWithTax * this.config.taxModifier ) : data[i].PriceNoTax ) * 100
 			});
 		}
 
@@ -252,7 +254,11 @@ Module.register("MMM-SpotPrices", {
 			let numb = Math.round((currentPrice.Price + Number.EPSILON) * 10) / 10;
 			document.getElementById("currentPrice").innerHTML = numb.toFixed(1).replace(".",",");
 
-			if (! this.config.Chart){ return; }
+			if (! this.config.chart){ return; }
+
+			if (this.config.priceResolution == 60){
+				this.config.chartConfig.options.plugins.datalabels.font.size = 12
+			}
 
 			if (this.config.includeCurrent || this.config.includePast){
 				if (this.config.includePast){

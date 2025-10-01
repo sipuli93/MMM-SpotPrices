@@ -27,7 +27,8 @@ var config = {
 | Option           | Description
 |----------------- |-----------
 | `region`         | *Optional*  Energy price region <br><br>**Options:** DK1, DK2, EE, FI, LT, LV, NO1, NO2, NO3, NO4, NO5, SE1, SE2, SE3, SE4 <br>**Type:** `string` <br>**Default:** "FI"
-| `Chart`          | *Optional*  Display price chart <br><br>**Type:** `boolean` <br>**Default:** true
+| `chart`          | *Optional*  Display price chart <br><br>**Type:** `boolean` <br>**Default:** true
+| `priceResolution`    | *Optional*  Price resolution. <br><br>**Options:** 15 or 60 <br>**Type:** `integer` <br>**Default:** 15
 | `includeCurrent` | *Optional*  Include current price to chart. Current price is highlighted. <br><br>**Type:** `boolean` <br>**Default:** false
 | `includePast`    | *Optional*  Include past prices to chart. Current price is highlighted. <br><br>**Type:** `boolean` <br>**Default:** false
 | `includeTax`     | *Optional*  Include tax in prices <br><br>**Type:** `boolean` <br>**Default:** true
