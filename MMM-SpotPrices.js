@@ -76,8 +76,9 @@ Module.register("MMM-SpotPrices", {
 							color: "#fff",
 							font: {
 								weight: "bold",
-								size: 8
+								size: 10
 							},
+							display: "auto",
 							formatter: function(value, context){
 								let numb = Math.round((value + Number.EPSILON) * 10) / 10;
 								return numb.toFixed(1).replace(".",",");
@@ -239,8 +240,9 @@ Module.register("MMM-SpotPrices", {
 			var pastPrices = [];
 			var futurePrices = [];
 			var currentPrice = null;
+			var priceResolution = this.config.priceResolution * 60 * 1000
 			for (let i=0; i<this.dataRequest.prices.length; i++){
-				if (this.dataRequest.prices[i].DateTimeUTC - currentTime < -1000*60*60){
+				if (this.dataRequest.prices[i].DateTimeUTC - currentTime < -1 * priceResolution){
 					pastPrices.push(this.dataRequest.prices[i]);
 				} else if (this.dataRequest.prices[i].DateTimeUTC - currentTime < 0){
 					currentPrice = this.dataRequest.prices[i];
@@ -257,7 +259,8 @@ Module.register("MMM-SpotPrices", {
 			if (! this.config.chart){ return; }
 
 			if (this.config.priceResolution == 60){
-				this.config.chartConfig.options.plugins.datalabels.font.size = 12
+				this.config.chartConfig.options.plugins.datalabels.font.size = 10;
+				this.config.chartConfig.options.plugins.datalabels.display = true;
 			}
 
 			if (this.config.includeCurrent || this.config.includePast){
