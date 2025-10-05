@@ -20,6 +20,12 @@ Module.register("MMM-SpotPrices", {
 		priceResolution: 15,
 		includeTax: true,
 		taxModifier: 1.0,
+		onlyChart: false,
+		priceDesimals: 1,
+		priceDesimalSeparator: ",",
+		hourlyColor: false,
+		yGrid: false,
+		dataLabels: true,
 		currentPriceHeader: "Sähkön hinta nyt",
 		currentPriceFooter: "snt/kWh",
 		chartConfig:{
@@ -29,7 +35,16 @@ Module.register("MMM-SpotPrices", {
 						datalabels: {
 							align: "end",
 							anchor: "end",
-							rotation: -90
+							rotation: -90,
+							color: "#fff",
+							font: {
+								weight: "bold",
+								size: 10
+							},
+							display: "auto",
+							formatter: function(value, context){
+								return value.replace(".",context.dataset.datalabels.desimalSeparator);
+							}
 						}
 					}]
 				},
@@ -52,6 +67,14 @@ Module.register("MMM-SpotPrices", {
 					scales: {
 						y: {
 							ticks: {
+								display: false,
+								font: {
+									weight: "bold",
+								},
+								color: "#fff"
+							},
+							grid: {
+								color: "#aaa",
 								display: false
 							},
 							suggestedMax: 15
@@ -71,18 +94,6 @@ Module.register("MMM-SpotPrices", {
 						},
 						tooltip: {
 							enabled: false
-						},
-						datalabels: {
-							color: "#fff",
-							font: {
-								weight: "bold",
-								size: 10
-							},
-							display: "auto",
-							formatter: function(value, context){
-								let numb = Math.round((value + Number.EPSILON) * 10) / 10;
-								return numb.toFixed(1).replace(".",",");
-							}
 						}
 					}
 				}
@@ -95,6 +106,21 @@ Module.register("MMM-SpotPrices", {
 		var self = this;
 		Log.info("Starting module: " + this.name);
 		var dataRequest = null;
+
+		this.config.chartConfig.data.datasets[0].datalabels.desimalSeparator = this.config.priceDesimalSeparator;
+
+		if (this.config.yGrid){
+			this.config.chartConfig.options.scales.y.ticks.display = true;
+			this.config.chartConfig.options.scales.y.grid.display = true;
+		}
+
+		if (! this.config.dataLabels){
+			this.config.chartConfig.data.datasets[0].datalabels.display = false;
+		} else {
+			if (this.config.priceResolution == 60){
+				this.config.chartConfig.data.datasets[0].datalabels.display = true;
+			}
+		}
 
 		Chart.register(ChartDataLabels);
 
@@ -164,25 +190,28 @@ Module.register("MMM-SpotPrices", {
 		var self = this;
 
 		var wrapper = document.createElement("div");
-		wrapper.classList.add("flex-row");
 
 		if (this.dataRequest) {
-			var currentPriceElem = document.createElement("div");
-			currentPriceElem.classList.add("flex-column");
-			var currentPriceHeader = document.createElement("div");
-			currentPriceHeader.appendChild(document.createTextNode(this.config.currentPriceHeader));
-			currentPriceElem.appendChild(currentPriceHeader);
-			var currentPriceValue = document.createElement("div");
-			currentPriceValue.id = "currentPrice";
-                        currentPriceValue.appendChild(document.createTextNode(". . ."));
-			currentPriceElem.appendChild(currentPriceValue);
-                        var currentPriceSup = document.createElement("div");
-                        currentPriceSup.appendChild(document.createTextNode(this.config.currentPriceFooter));
-                        currentPriceElem.appendChild(currentPriceSup);
+			wrapper.id = "spotPrices" + this.data.index;
+			wrapper.classList.add("flex-row");
 
-			wrapper.appendChild(currentPriceElem);
+			if (! this.config.onlyChart){
+				var currentPriceElem = document.createElement("div");
+				currentPriceElem.classList.add("flex-column");
+				var currentPriceHeader = document.createElement("div");
+				currentPriceHeader.appendChild(document.createTextNode(this.config.currentPriceHeader));
+				currentPriceElem.appendChild(currentPriceHeader);
+				var currentPriceValue = document.createElement("div");
+				currentPriceValue.id = "currentPrice";
+	                        currentPriceValue.appendChild(document.createTextNode(". . ."));
+				currentPriceElem.appendChild(currentPriceValue);
+                	        var currentPriceSup = document.createElement("div");
+				currentPriceSup.appendChild(document.createTextNode(this.config.currentPriceFooter));
+				currentPriceElem.appendChild(currentPriceSup);
 
-			if ( this.config.chart){
+				wrapper.appendChild(currentPriceElem);
+			}
+			if (this.config.chart || this.config.onlyChart){
 				var futureCanvasWrapper = document.createElement("div");
 				futureCanvasWrapper.classList.add("chart-holder");
 				var futureCanvasElem = document.createElement("canvas");
@@ -216,7 +245,7 @@ Module.register("MMM-SpotPrices", {
 		for (let i=0;i<data.length;i++){
 			this.dataRequest.prices.push({
 				"DateTimeUTC": new Date(new Date(data[i].DateTime).toUTCString()),
-				"Price": ( this.config.includeTax ? ( data[i].PriceWithTax * this.config.taxModifier ) : data[i].PriceNoTax ) * 100
+				"Price": self.formatPrice(( this.config.includeTax ? ( data[i].PriceWithTax * this.config.taxModifier ) : data[i].PriceNoTax ) * 100)
 			});
 		}
 
@@ -233,9 +262,9 @@ Module.register("MMM-SpotPrices", {
 	},
 
 	loadPricesChart: function() {
-		var self = this;
+	var self = this;
 		//check and wait if html elements arent ready
-		if (document.getElementById("currentPrice") !== null){
+		if (document.querySelector("#spotPrices" + this.data.index) !== null){
 			var currentTime = new Date();
 			var pastPrices = [];
 			var futurePrices = [];
@@ -253,42 +282,47 @@ Module.register("MMM-SpotPrices", {
 					futurePrices.push(this.dataRequest.prices[i]);
 				}
 			}
-			let numb = Math.round((currentPrice.Price + Number.EPSILON) * 10) / 10;
-			document.getElementById("currentPrice").innerHTML = numb.toFixed(1).replace(".",",");
-
-			if (! this.config.chart){ return; }
-
-			if (this.config.priceResolution == 60){
-				this.config.chartConfig.options.plugins.datalabels.font.size = 10;
-				this.config.chartConfig.options.plugins.datalabels.display = true;
+			if (! this.config.onlyChart){
+				document.getElementById("currentPrice").innerHTML = currentPrice.Price.replace(".",this.config.priceDesimalSeparator);
 			}
 
-			if (this.config.includeCurrent || this.config.includePast){
-				if (this.config.includePast){
-					this.config.indexOfCurrentPrice = pastPrices.length;
-					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
-						let colors = color.index == this.config.indexOfCurrentPrice ? "#fff" : "#999";
-						return colors;
-					}
-				}
-				else {
-					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
-						let colors = color.index < 1 ? "#fff" : "#999";
-						return colors;
-					}
-				}
+			if ((! this.config.chart) && (! this.config.onlyChart)){
+				return;
 			}
+
 			var xValues = [];
 			var yValues = [];
+			var evenHourIndexes = [];
+			var hourCount = 0;
 			if (this.config.includePast){
 				for (let i=0; i<pastPrices.length; i++){
 					yValues.push(pastPrices[i].Price);
 					xValues.push(pastPrices[i].DateTimeUTC.getHours());
+					hourCount++;
+					if (pastPrices[i].DateTimeUTC.getHours() % 2 == 0){ evenHourIndexes.push(i); }
 				}
 			}
 			for (let i=0; i<futurePrices.length; i++){
 				yValues.push(futurePrices[i].Price);
 				xValues.push(futurePrices[i].DateTimeUTC.getHours());
+				if (futurePrices[i].DateTimeUTC.getHours() % 2 == 0){ evenHourIndexes.push(i+hourCount); }
+			}
+
+			if (this.config.includeCurrent || this.config.includePast){
+				this.config.evenHourIndexes = evenHourIndexes;
+				if (this.config.includePast){
+					this.config.indexOfCurrentPrice = pastPrices.length;
+					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
+						let colors = color.index == this.config.indexOfCurrentPrice ? "#fff" : this.config.evenHourIndexes.includes(color.index) && this.config.hourlyColor ? "#555" : "#999";
+						return colors;
+					}
+				}
+				else {
+					this.config.chartConfig.options.elements.bar.backgroundColor = color => {
+						let colors = color.index < 1 ? "#fff" : this.config.evenHourIndexes.includes(color.index) && this.config.hourlyColor ? "#555" : "#999";
+						return colors;
+					}
+				}
 			}
 			var ctx = document.getElementById("pricesChart").getContext("2d");
 			if (typeof this.chart !== 'undefined'){ this.chart.destroy(); }
@@ -301,4 +335,9 @@ Module.register("MMM-SpotPrices", {
 		}
 	},
 
+	formatPrice: function(price) {
+	var self = this;
+		let numb = Math.round((price + Number.EPSILON) * 1000) / 1000;
+		return numb.toFixed(this.config.priceDesimals);
+	},
 });
