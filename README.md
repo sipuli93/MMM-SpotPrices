@@ -36,5 +36,8 @@ var config = {
 | `taxModifier`    | *Optional*  Multiplier to add tax, ex. for 10% tax use `1.1` FI REGION TAXES ARE ADDED AUTOMATICALLY! <br>**Type:** `float` <br>**Default:** `1.0`
 | `priceDesimals`      | *Optional*  Set amount of displayed desimals. <br><br>**Type:** `integer` <br>**Default:** 1
 | `priceDesimalSeparator`      | *Optional*  Set desimal separator. <br><br>**Type:** `string` <br>**Default:** ","
+| `hourlyColor`     | *Optional*  Alternate bar colors for better visualization. <br><br>**Type:** `boolean` <br>**Default:** false
+| `yGrid`     | *Optional*  Enable y-scale grid and ticks. <br><br>**Type:** `boolean` <br>**Default:** false
+| `dataLabels`     | *Optional*  Disable datalabels. <br><br>**Type:** `boolean` <br>**Default:** true
 | `currentPriceHeader` | *Optional*  Add header for current price <br><br>**Type:** `string` <br>**Default:** "Sähkön hinta nyt"
 | `currentPriceFooter` | *Optional*  Add footer for current price <br><br>**Type:** `string` <br>**Default:** "snt/kWh"
